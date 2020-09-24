@@ -1,0 +1,30 @@
+.mainFxmlClass {
+    -fx-background-color: chocolate;
+}
+
+#beginGameButton{
+    -fx-padding: 10px 210px 10px 210px;
+    -fx-background-color: #0066cc;
+    -fx-text-fill: black;
+    -fx-background-radius: 50%;
+}
+
+#createRhythmButton{
+    
+    
+}
+
+#gameName{
+    -fx-text-fill: #0066cc; 
+}
+
+
+#musicLabel{
+    
+}
+
+#errorLabel{
+    -fx-border-size:50px;
+    -fx-border-color:black;
+    -fx-text-fill:black;
+}
