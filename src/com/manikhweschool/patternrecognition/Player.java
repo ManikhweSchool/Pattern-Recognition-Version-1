@@ -1,8 +1,10 @@
 package com.manikhweschool.patternrecognition;
 
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.buildingblocks.Location;
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionMarks;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.PositionMarks;
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Map;
@@ -16,6 +18,9 @@ public class Player {
     private int currentQueueIndex = 0;
     
     private int numberOfCartesianPlanesToTrack;
+    
+    private DirectionMarks directionMarks;
+    private PositionMarks positionMarks;
     
     public Player(){
     
@@ -36,6 +41,9 @@ public class Player {
             positionBasedAnswers.add(new LinkedHashMap<>());
             directionBasedAnswers.add(new LinkedHashMap<>());
         }
+        
+        directionMarks = new DirectionMarks();
+        positionMarks = new PositionMarks();
     }
     
     public void addAnswer(int queueIndex, PositionBasedAnswer answer, Location location){ 
@@ -63,6 +71,8 @@ public class Player {
                 map.put(location, new LinkedList<>());
             
             map.get(location).add(answer);
+            
+            
         }
             
         else
@@ -83,10 +93,12 @@ public class Player {
         return numberOfCartesianPlanesToTrack;
     }
     
-    public void displayPlayerDirectionBasedAnswers(){
-        
-        
-        
+    public DirectionMarks getDirectionMarks(){
+        return directionMarks;
+    }
+    
+    public PositionMarks getPositionMarks(){
+        return positionMarks;
     }
     
     public void displayPlayerPositionBasedAnswers(){
@@ -102,10 +114,29 @@ public class Player {
                 System.out.println("\t\t" + portionMap.getKey());
                 for(PositionBasedAnswer answer : portionMap.getValue())
                     System.out.println("\t\t\t" + answer);
+                
+                
+            }
+        }
+        
+        System.out.println("\n=================Player Position Answers====================\n");
+        for(int i = 1; i <= positionBasedAnswers.size();i++){
+            System.out.println("Cartesian Plane No : " + i);
+            
+            for(Entry<Location, LinkedList<PositionBasedAnswer>> portionMap : positionBasedAnswers.get(i-1).entrySet()){
+                System.out.println("\t\t" + portionMap.getKey());
+                
+                for(PositionBasedAnswer answer : portionMap.getValue()){
+                    System.out.println("\t\t\t" + answer);
+                    
+                }
                 System.out.println();
                 
             }
         }
+        
+        positionMarks.setPositionBasedCorrectAnswers(positionBasedCorrectAnswers);
+        positionMarks.setPositionBasedAnswers(positionBasedAnswers);
     }
     
     public void grantDirectionBasedMarks(Map<Integer,Map<Location, LinkedList<DirectionBasedAnswer>>> directionBasedCorrectAnswers){
@@ -124,7 +155,7 @@ public class Player {
             }
         }
         
-        System.out.println("\n=================Player Answers====================\n");
+        System.out.println("\n=================Player Directions Answers====================\n");
         for(int i = 1; i <= directionBasedAnswers.size();i++){
             System.out.println("Cartesian Plane No : " + i);
             
@@ -139,5 +170,8 @@ public class Player {
                 
             }
         }
+        
+        directionMarks.setDirectionBasedCorrectAnswers(directionBasedCorrectAnswers);
+        directionMarks.setDirectionBasedAnswers(directionBasedAnswers);
     }
 }

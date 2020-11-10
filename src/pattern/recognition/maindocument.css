@@ -15,7 +15,14 @@
 }
 
 #gameName{
-    -fx-text-fill: #0066cc; 
+    -fx-text-fill: #0066cc;
+}
+
+
+#blackBallMoveLabel,
+#regionBallsMoveLabel, #speedLabelInfo,
+#musicLabel{
+    -fx-text-fill: darkmagenta; 
 }
 
 

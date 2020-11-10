@@ -31,10 +31,6 @@ public class PointBasedGame  extends Game{
     protected Thread onPathPortionThread;
     protected QueenBallMovement onPathPortionTask;
     
-    protected PointBasedGame() throws Exception{
-        this((byte)(Math.random()*2)==0,new CartesianPlane(), System.currentTimeMillis());
-        
-    }
     
     protected PointBasedGame(boolean positionGame, CartesianPlane cartesianPlane,long startTime){
         super(positionGame,cartesianPlane, startTime);
@@ -46,14 +42,14 @@ public class PointBasedGame  extends Game{
         
         if(cartesianPlane.getRegionOne().exist()){
             regionOneTask = new RegionBallMovement(
-            cartesianPlane.getRegionOne(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionOne(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionOneThread = new Thread(regionOneTask);
             regionOneThread.start();
         }
         if(cartesianPlane.getRegionTwo().exist()){
             regionTwoTask = new RegionBallMovement(
-            cartesianPlane.getRegionTwo(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionTwo(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionTwoThread = new Thread(regionTwoTask);
             regionTwoThread.start();
@@ -61,28 +57,28 @@ public class PointBasedGame  extends Game{
         }
         if(cartesianPlane.getRegionThree().exist()){
             regionThreeTask = new RegionBallMovement(
-            cartesianPlane.getRegionThree(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionThree(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionThreeThread = new Thread(regionThreeTask);
             regionThreeThread.start();
         }
         if(cartesianPlane.getRegionFour().exist()){
             regionFourTask = new RegionBallMovement(
-            cartesianPlane.getRegionFour(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionFour(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionFourThread = new Thread(regionFourTask);
             regionFourThread.start();
         }
         if(cartesianPlane.getRegionFive().exist()){
             regionFiveTask = new RegionBallMovement(
-            cartesianPlane.getRegionFive(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionFive(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionFiveThread = new Thread(regionFiveTask);
             regionFiveThread.start();
         }
         if(cartesianPlane.getRegionSix().exist()){
             regionSixTask = new RegionBallMovement(
-            cartesianPlane.getRegionSix(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionSix(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionSixThread = new Thread(regionSixTask);
             regionSixThread.start();
@@ -90,7 +86,7 @@ public class PointBasedGame  extends Game{
         }
         if(cartesianPlane.getRegionSeven().exist()){
             regionSevenTask = new RegionBallMovement(
-            cartesianPlane.getRegionSeven(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionSeven(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionSevenThread = new Thread(regionSevenTask);
             regionSevenThread.start();
@@ -98,7 +94,7 @@ public class PointBasedGame  extends Game{
         }
         if(cartesianPlane.getRegionEight().exist()){
             regionEightTask = new RegionBallMovement(
-            cartesianPlane.getRegionEight(), cartesianPlane.getMusic().getRhythm(0),
+            cartesianPlane.getRegionEight(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
             regionEightThread = new Thread(regionEightTask);
             regionEightThread.start();
@@ -107,14 +103,34 @@ public class PointBasedGame  extends Game{
         
         onPathPortionTask = 
         new QueenBallMovement(cartesianPlane, 
-        cartesianPlane.getMusic().getRhythm(0),startTime);
+        cartesianPlane.getMusic().getCurrentRhythm(),startTime);
         onPathPortionThread = new Thread(onPathPortionTask);
         onPathPortionThread.start();
     }
     
     private void handleRhythmShiftButtons(){
     
-    
+        rhythmFitWell.setOnAction(e->{
+            if(rhythmFitWell.isSelected()){
+                cartesianPlane.getMusic().getCurrentRhythm().setRhythmFit(true);
+                
+                rightShiftButton.setDisable(true);
+                leftShiftButton.setDisable(true);
+                pause();
+                cartesianPlane.getMusic().stop();
+            }
+            else{
+                cartesianPlane.getMusic().getCurrentRhythm().setRhythmFit(false);
+                if(rightShiftButton.isDisable() || leftShiftButton.isDisable()){
+                    rightShiftButton.setDisable(false);
+                    leftShiftButton.setDisable(false);
+                }
+                
+                if(rhythmShiftAmountInfo.getText().equals("Music And/Or Rhythm Is Added To The Database."))
+                    rhythmShiftAmountInfo.setText("Current Rhythm Shift Amount Is " + rhythmShiftAmount + " Milliseconds.");
+            }
+        });
+        
         if(rightShiftButton.getOnAction()==null)
             rightShiftButton.setOnAction(e->{
             pause();
@@ -135,17 +151,29 @@ public class PointBasedGame  extends Game{
         if(applyRhythmShiftButton.getOnAction()==null)
             applyRhythmShiftButton.setOnAction(e->{
             if(rhythmShiftAmount < 0) {
-                cartesianPlane.getMusic().getCurrentRhythm().decreaseTimesBy(Math.abs(rhythmShiftAmount));
+                if(!rhythmFitWell.isSelected()){
+                    cartesianPlane.getMusic().getCurrentRhythm().startOverRhythmShift();
+                    cartesianPlane.getMusic().getCurrentRhythm().decreaseTimesBy(Math.abs(rhythmShiftAmount));
+                    
+                }
                 cartesianPlane.refresh();
                 initializeAnimation();
                 cartesianPlane.getMusic().startOver();
             }
-            else if(rhythmShiftAmount>0){
-                cartesianPlane.getMusic().getCurrentRhythm().increaseTimesBy(rhythmShiftAmount);
+            else{
+                if(!rhythmFitWell.isSelected()){
+                    cartesianPlane.getMusic().getCurrentRhythm().startOverRhythmShift();
+                    cartesianPlane.getMusic().getCurrentRhythm().increaseTimesBy(rhythmShiftAmount);
+                    
+                }
                 cartesianPlane.refresh();
                 initializeAnimation();
                 cartesianPlane.getMusic().startOver();
             }
+            
+            if(rhythmFitWell.isSelected())
+                rhythmShiftAmountInfo.setText("Music And/Or Rhythm Is Added To The Database.");
+            
         });
         
     }
@@ -169,6 +197,7 @@ public class PointBasedGame  extends Game{
         if(cartesianPlane.getRegionEight().exist())
             regionEightTask.pause();
         onPathPortionTask.pause();
+        cartesianPlane.getMusic().stop();
     }
     
 }

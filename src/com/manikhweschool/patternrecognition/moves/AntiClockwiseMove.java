@@ -2,7 +2,9 @@ package com.manikhweschool.patternrecognition.moves;
 
 public class AntiClockwiseMove extends QueenMove{
     
-    
+    public AntiClockwiseMove() {
+
+    }
     
      @Override
     public String toString(){

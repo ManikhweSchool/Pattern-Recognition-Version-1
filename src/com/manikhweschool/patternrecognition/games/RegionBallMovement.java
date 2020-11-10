@@ -1,7 +1,7 @@
 package com.manikhweschool.patternrecognition.games;
 
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.Rhythm;
 import com.manikhweschool.patternrecognition.space.Region;
 
@@ -110,6 +110,12 @@ public class RegionBallMovement  extends MovementTask{
         public void handle(ActionEvent e){
 
             movePoint();    
+            
+            
+            if(!region.getRegionBall().isVisible() && 
+            region.getMusic().getCurrentRhythm().getRhythmFit())
+                region.getPlayer().getDirectionMarks().increaseNoOfStepsExceeded();
+            
         } 
         
     }

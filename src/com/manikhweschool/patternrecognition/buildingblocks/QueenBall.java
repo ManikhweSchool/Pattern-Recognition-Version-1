@@ -1,10 +1,9 @@
 package com.manikhweschool.patternrecognition.buildingblocks;
 
-import com.manikhweschool.patternrecognition.buildingblocks.Ball;
+
 import com.manikhweschool.patternrecognition.moves.QueenMove;
 import com.manikhweschool.patternrecognition.moves.ClockwiseMove;
 
-import java.util.*;
 import javafx.scene.paint.Color;
 
 public class QueenBall extends Ball implements Cloneable{

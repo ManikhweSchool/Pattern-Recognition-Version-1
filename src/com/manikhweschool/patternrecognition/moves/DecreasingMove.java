@@ -2,7 +2,9 @@ package com.manikhweschool.patternrecognition.moves;
 
 public class DecreasingMove extends QueenMove{
     
-    
+    public DecreasingMove() {
+
+    }
     
      @Override
     public String toString(){

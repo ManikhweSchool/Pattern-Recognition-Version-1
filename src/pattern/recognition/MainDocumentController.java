@@ -6,9 +6,9 @@ import com.manikhweschool.patternrecognition.Player;
 import com.manikhweschool.patternrecognition.Rhythm;
 import com.manikhweschool.patternrecognition.buildingblocks.CartesianPlane;
 import com.manikhweschool.patternrecognition.buildingblocks.Cell;
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.buildingblocks.Location;
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
 import com.manikhweschool.patternrecognition.games.AntiClockwisePointBasedGame;
 import com.manikhweschool.patternrecognition.games.ClockwisePointBasedGame;
 import com.manikhweschool.patternrecognition.games.DecreasingPointBasedGame;
@@ -39,6 +39,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
@@ -60,6 +61,8 @@ public class MainDocumentController implements Initializable {
     private ComboBox<String> typeOfAnswers;
     @FXML
     private TextArea rhythmTextArea;
+    
+    private final ToggleGroup planesGroup = new ToggleGroup();
     @FXML
     private RadioButton plainRB;
     @FXML
@@ -68,6 +71,8 @@ public class MainDocumentController implements Initializable {
     private RadioButton numbersRB;
     @FXML
     private RadioButton allRB;
+    
+    private final ToggleGroup attemptsGroup = new ToggleGroup();
     @FXML
     private RadioButton oneAttemptRB;
     @FXML
@@ -76,12 +81,30 @@ public class MainDocumentController implements Initializable {
     private RadioButton threeAttemptsRB;
     @FXML
     private RadioButton fourAttemptsRB;
+    
+    private final ToggleGroup movingStrategyGroup = new ToggleGroup();
+    @FXML
+    private RadioButton rowsOnlyRB;
+    @FXML
+    private RadioButton columnsOnlyRB;
+    
+    private final ToggleGroup blackBallMovesGroup = new ToggleGroup();
+    @FXML
+    private RadioButton clockwiseMoveRB;
+    @FXML
+    private RadioButton anticlockwiseMoveRB;
+    @FXML
+    private RadioButton incrementalMoveRB;
+    @FXML
+    private RadioButton decrementalMoveRB;
+    
     @FXML
     private Label gameName;
     @FXML
     private Label errorLabel;
     @FXML
     private Label musicLabel;
+    
     @FXML
     private Button beginGameButton;
     @FXML
@@ -90,6 +113,8 @@ public class MainDocumentController implements Initializable {
     private Label speedLabel;
     @FXML
     private Label speedLabelInfo;
+    
+    
     @FXML
     private ComboBox<String> r1MovingStrategy;
     @FXML
@@ -107,6 +132,11 @@ public class MainDocumentController implements Initializable {
     @FXML
     private ComboBox<String> r8MovingStrategy;
     
+    @FXML
+    private Label blackBallMoveLabel;
+    @FXML
+    private Label regionBallsMoveLabel;
+    
     ArrayList<RegionMovingStrategy> movingStrategies = new ArrayList<>();
     
     private boolean hasRhythm = false;
@@ -123,6 +153,7 @@ public class MainDocumentController implements Initializable {
     private boolean positionGame;
    
     private Stage primaryStage;
+    
     private int width = 600;
     private int height = 600;
     
@@ -141,13 +172,16 @@ public class MainDocumentController implements Initializable {
     
     public byte numberOfTries;
     
+    public static boolean gameHasStarted = false;
+    
+    
     public void readRhythm(KeyEvent event){
     
         if(initTime==-1){
             System.out.println("Error : Start By Playing Music First.");
             return;
         }
-        byte numberOfMoves = 0;
+        byte numberOfMoves = 0; 
         
         if(event.getCode()==KeyCode.NUMPAD1 || event.getCode()==KeyCode.DIGIT1){
             numberOfMoves = 1;
@@ -207,8 +241,7 @@ public class MainDocumentController implements Initializable {
             
             music.addRhythm(rhythm);
             music.stop();
-            
-            
+ 
                 
         }
         
@@ -293,24 +326,34 @@ public class MainDocumentController implements Initializable {
             plane = Plane.All_Planes;
     }
     
-    private void chooseAttempts(){
+    private boolean chooseAttempts(){
         
+        boolean attemptChosen = true;
         
-        if(twoAttemptsRB.isSelected())
+        if(oneAttemptRB.isSelected())
+            numberOfTries = 1;
+        else if(twoAttemptsRB.isSelected())
             numberOfTries = 2;
         else if(threeAttemptsRB.isSelected())
             numberOfTries = 3;
         else if(fourAttemptsRB.isSelected())
             numberOfTries = 4;
-        else
-            numberOfTries = 1;
+        else{
+            errorLabel.setText("Error : Make Sure You Pick Number Of Tries.");
+            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+            errorLabel.setVisible(true);
+            attemptChosen = !attemptChosen;
+        }
+        
+        return attemptChosen;
     }
     
     public void showGame(ActionEvent event) {  
         
         choosePlane();
-        chooseAttempts();
-        plane = Plane.All_Planes;
+        if(!chooseAttempts())
+            return;
+        
         if(typeOfAnswers.getSelectionModel().isSelected(0) || typeOfAnswers.getSelectionModel().isSelected(1))
             positionGame = typeOfAnswers.getSelectionModel().isSelected(0);
         else{
@@ -337,95 +380,152 @@ public class MainDocumentController implements Initializable {
             return;
         }
         
-        
+       rowsOnlyRB.setOnAction(e->{
+            if(rowsOnlyRB.isSelected()){
+                r1MovingStrategy.getSelectionModel().select(null);
+                r2MovingStrategy.getSelectionModel().select(null);
+                r3MovingStrategy.getSelectionModel().select(null);
+                r4MovingStrategy.getSelectionModel().select(null);
+                r5MovingStrategy.getSelectionModel().select(null);
+                r6MovingStrategy.getSelectionModel().select(null);
+                r7MovingStrategy.getSelectionModel().select(1);
+                r8MovingStrategy.getSelectionModel().select(null);
+
+                movingStrategies.clear();
+                for(byte i = 1; i <=8;i++)
+                    movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            }
+       });
+        columnsOnlyRB.setOnAction(e->{
+            if(columnsOnlyRB.isSelected()){
+
+                r1MovingStrategy.getSelectionModel().select(-1);
+                r2MovingStrategy.getSelectionModel().select(-1);
+                r3MovingStrategy.getSelectionModel().select(-1);
+                r4MovingStrategy.getSelectionModel().select(-1);
+                r5MovingStrategy.getSelectionModel().select(-1);
+                r6MovingStrategy.getSelectionModel().select(-1);
+                r7MovingStrategy.getSelectionModel().select(-1);
+                r8MovingStrategy.getSelectionModel().select(-1);
+
+                movingStrategies.clear();
+                for(byte i = 1; i <=8;i++)
+                    movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            }
+        });
         
         //----------------------Region One-----------------------------
-        if(r1MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r1MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region One.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r1MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r1MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region One.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
         //----------------------Region Two-----------------------------
-        if(r2MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r2MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Two.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r2MovingStrategy.getSelectionModel().isSelected(0))
+               movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r2MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Two.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Three-----------------------------
-        if(r3MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r3MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Three.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Three-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r3MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r3MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Three.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Four-----------------------------
-        if(r4MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r4MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Four.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Four-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r4MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r4MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Four.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Five-----------------------------
-        if(r5MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r5MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Five.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Five-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r5MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r5MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Five.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Six-----------------------------
-        if(r6MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r6MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Six.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Six-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r6MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r6MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Six.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Seven-----------------------------
-        if(r7MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r7MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Seven.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Seven-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r7MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r7MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Seven.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
         }
-         //----------------------Region Eight-----------------------------
-        if(r8MovingStrategy.getSelectionModel().isSelected(0))
-            movingStrategies.add(RegionMovingStrategy.Row_By_Row);
-        else if(r8MovingStrategy.getSelectionModel().isSelected(1))
-            movingStrategies.add(RegionMovingStrategy.Column_By_Column);
-        else{
-            errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Eight.");
-            errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
-            errorLabel.setVisible(true);
-            return;
+        //----------------------Region Eight-----------------------------
+        if(!columnsOnlyRB.isSelected() && !rowsOnlyRB.isSelected()){
+            if(r8MovingStrategy.getSelectionModel().isSelected(0))
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+            else if(r8MovingStrategy.getSelectionModel().isSelected(1))
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
+            else{
+                errorLabel.setText("Error : Make Sure You Choose Moving Strategy For Region Eight.");
+                errorLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+                errorLabel.setVisible(true);
+                return;
+            }
+        }
+        
+        if(rowsOnlyRB.isSelected())
+            for(byte i = 1; i <=8;i++)
+                movingStrategies.add(RegionMovingStrategy.Row_By_Row);
+        
+        else if(columnsOnlyRB.isSelected()){
+            for(byte i = 1; i <=8;i++)
+                movingStrategies.add(RegionMovingStrategy.Column_By_Column);
         }
         
         primaryStage = new Stage();
@@ -447,21 +547,25 @@ public class MainDocumentController implements Initializable {
             
             CartesianPlane.setNumberOfTries(numberOfTries);
             CartesianPlane.setPlaneType(plane);
-            switch((byte)(Math.random()*4)){
-                case 0 : game = new ClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
-                         backwardSteps, music, startTime, movingStrategies); break;
-                case 1 : game = new AntiClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
-                         backwardSteps, music, startTime,movingStrategies); break;
-                case 2 : game = new IncreasingPointBasedGame(positionGame,width,height,forwardSteps, 
-                         backwardSteps, music, startTime,movingStrategies); break;
-                case 3 : game = new DecreasingPointBasedGame(positionGame,width,height,forwardSteps, 
-                         backwardSteps, music, startTime,movingStrategies); break;
-            }
+            
+            if(clockwiseMoveRB.isSelected())
+                game = new ClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime, movingStrategies);
+            else if(anticlockwiseMoveRB.isSelected())
+                game = new AntiClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            else if(incrementalMoveRB.isSelected())
+                game = new IncreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            else
+                game = new DecreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            
             
             addCellListeners();
+            game.getCartesianPlane().setPlayer(player);
             game.getCartesianPlane().requestFocus();
             
-            //game.getCartesianPlane().getMusic().play();
             Scene scene = new Scene(game);
             
             primaryStage.setScene(scene);
@@ -475,6 +579,7 @@ public class MainDocumentController implements Initializable {
         primaryStage.setTitle("Pattern Recognition Version I");
         primaryStage.show();
         
+        
         initializeAnimation();
         
         
@@ -483,7 +588,7 @@ public class MainDocumentController implements Initializable {
         startTime = System.currentTimeMillis();
         
         game.getCartesianPlane().requestFocus();
-        
+        gameHasStarted = true;
     }
     
     private void initiateSomeDataFields(){
@@ -492,8 +597,6 @@ public class MainDocumentController implements Initializable {
         directionBasedCorrectAnswers = new LinkedHashMap<>();
         positionBasedCorrectAnswers = new LinkedHashMap<>();
         
-        
-       
         marks = new LinkedHashMap<>();
         width = 500;
         height = 500;
@@ -552,36 +655,47 @@ public class MainDocumentController implements Initializable {
         game.getCartesianPlane().setOnKeyPressed(e->{
         
             byte direction = -1;
+            byte previousDirection = direction;
             
-            
-            if(!positionGame && e.getCode()==KeyCode.LEFT)
+            if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD4 || e.getCode()==KeyCode.LEFT))
                 direction = 1;          
-            else if(!positionGame && e.getCode()==KeyCode.UP)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD8 || e.getCode()==KeyCode.UP))
                 direction = 2;
-            else if(!positionGame && e.getCode()==KeyCode.DOWN)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD2 || e.getCode()==KeyCode.DOWN))
                 direction = 3;
-            else if(!positionGame && e.isControlDown() && e.getCode()==KeyCode.UP)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD7 || e.getCode()==KeyCode.S))
                 direction = 4;
-            else if(!positionGame && e.isAltDown() && e.getCode()==KeyCode.DOWN)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD3 || e.getCode()==KeyCode.D))
                 direction = 5;
-            else if(!positionGame && e.isAltDown() && e.getCode()==KeyCode.UP)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD9 || e.getCode()==KeyCode.F))
                 direction = 6;
-            else if(!positionGame && e.isControlDown() && e.getCode()==KeyCode.DOWN)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD1 || e.getCode()==KeyCode.A))
                 direction = 7;
-            else if(!positionGame && e.getCode()==KeyCode.RIGHT)
+            else if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD6 || e.getCode()==KeyCode.RIGHT))
                 direction = 8;
             
             if(!positionGame && direction != -1 && game.getCartesianPlane().isCurrentBallInvisible()){
-                //int currentRhythmIndex = music.getCurrentRhythmIndex();
-                //Rhythm currentRhythm = music.getRhythm(currentRhythmIndex);
+
                 DirectionBasedAnswer answer = new DirectionBasedAnswer(
                 System.currentTimeMillis()-startTime, direction);
+                
+                int nextAnswer = 
+                game.getCartesianPlane().findNextDirectionAnswer().getDirectionAnswer();
+                System.out.println("Next Answer : " + nextAnswer + "\tPlayer Answer : " + direction);
+                player.getDirectionMarks().resetUnansweredNoOfSteps();
+                
+                if(direction != nextAnswer &&
+                previousDirection != nextAnswer){
+                    player.getDirectionMarks().setIncorrectInput(true);
+                    
+                    endGame();
+                }
                 
                 player.addAnswer(CartesianPlane.cartesianPlaneNumber, 
                 answer,game.getCartesianPlane().getCurrentPortionToTrack());
             }
             
-            if(positionGame){
+            if(music.getCurrentRhythm().getRhythmFit() && positionGame){
                 
                 // Deal With A
                 if(positionAnswer.isEmpty() && e.getCode()==KeyCode.DIGIT1)positionAnswer += "0";
@@ -764,10 +878,27 @@ public class MainDocumentController implements Initializable {
                 else if(positionAnswer.length()==1 && e.getCode()==KeyCode.I)positionAnswer += "8";
                 
                 if(positionAnswer.length()==2){
+                    
                     PositionBasedAnswer answer = new PositionBasedAnswer(
                     System.currentTimeMillis()-startTime, 
                     Byte.parseByte(positionAnswer.substring(0, 1))
                     ,Byte.parseByte(positionAnswer.substring(1)));
+                    
+                    PositionBasedAnswer nextAnswer = 
+                    game.getCartesianPlane().findNextPositionAnswer();
+                    
+                    System.out.println("Next Answer -: " + "{Row : " + nextAnswer.getRowAnswer() + 
+                    ", Column : " + nextAnswer.getColumnAnswer() + "}" + "\tPlayer Answer -: " + 
+                    "{Row : " + answer.getRowAnswer() + 
+                     ", Column : " + answer.getColumnAnswer() + "}");
+                    player.getDirectionMarks().resetUnansweredNoOfSteps();
+                    
+                    if(answer.getColumnAnswer() != nextAnswer.getColumnAnswer() ||
+                    answer.getRowAnswer() != nextAnswer.getRowAnswer()){
+                         player.getPositionMarks().setIncorrectInput(true);
+                        endGame();
+                    }
+                    
                     player.addAnswer(CartesianPlane.cartesianPlaneNumber, 
                     answer,game.getCartesianPlane().getCurrentPortionToTrack());
                     positionAnswer = "";
@@ -840,44 +971,48 @@ public class MainDocumentController implements Initializable {
         }
     }
     
+    
     private class GameHandler implements EventHandler<ActionEvent>{
     
         @Override
         public void handle(ActionEvent e){
-
+            
+            if(player.getDirectionMarks().getUnansweredNoOfSteps()==1)
+                endGame();
+                
             if(game.getCartesianPlane().allPortionsVisited()){
                 directionBasedCorrectAnswers.put(CartesianPlane.cartesianPlaneNumber,
                 game.getCartesianPlane().retrieveCorrectDirectionBasedAnswers());
                 positionBasedCorrectAnswers.put(CartesianPlane.cartesianPlaneNumber,
                 game.getCartesianPlane().retrieveCorrectPositionBasedAnswers());
 
-                // Display All Expected Answers.
-                //player.grantPositionBasedMarks(positionBasedCorrectAnswers);
-                //player.grantDirectionBasedMarks(directionBasedCorrectAnswers);
-
                 CartesianPlane.decreaseTries();
                 CartesianPlane.incrementCartesianPlaneNumber();       
-               
-                if(CartesianPlane.getNumberOfTries()==0)
+              
+                if(CartesianPlane.getNumberOfTries()==0 ){
+                    player.getDirectionMarks().win();
                     endGame();
+                }
                 else
                 try{
                     
                     startTime = System.currentTimeMillis();
 
                     
-                    switch((byte)(Math.random()*4)){
-                        case 0 : game = new ClockwisePointBasedGame(positionGame,width,height,
-                               forwardSteps, backwardSteps, music, startTime,movingStrategies); break;
-                        case 1 : game = new AntiClockwisePointBasedGame(positionGame,width,height,
-                               forwardSteps, backwardSteps, music, startTime,movingStrategies); break;
-                        case 2 : game = new IncreasingPointBasedGame(positionGame,width,height,
-                               forwardSteps, backwardSteps, music, startTime,movingStrategies); break;
-                        case 3 : game = new DecreasingPointBasedGame(positionGame,width,height,
-                               forwardSteps, backwardSteps, music, startTime,movingStrategies); break;
-                    }
+                    if(clockwiseMoveRB.isSelected())
+                        game = new ClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                        backwardSteps, music, startTime, movingStrategies);
+                    else if(anticlockwiseMoveRB.isSelected())
+                        game = new AntiClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                        backwardSteps, music, startTime,movingStrategies);
+                    else if(incrementalMoveRB.isSelected())
+                        game = new IncreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                        backwardSteps, music, startTime,movingStrategies);
+                    else
+                        game = new DecreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                        backwardSteps, music, startTime,movingStrategies);
                     addCellListeners();
-
+                    
                     primaryStage.setScene(new Scene(game));
 
 
@@ -888,10 +1023,13 @@ public class MainDocumentController implements Initializable {
             }
 
             else if((plane!=Plane.Letters_Plane && 
-            player.getNumberOfCartesianPlanesToTrack()==CartesianPlane.cartesianPlaneNumber)){
-                endGame();
+            player.getNumberOfCartesianPlanesToTrack()==CartesianPlane.cartesianPlaneNumber)
+            ){
+                if(plane!=Plane.Numbers_Plane && player.getNumberOfCartesianPlanesToTrack() != 2)
+                    endGame();
             }
             
+            game.getCartesianPlane().setPlayer(player);
             game.getCartesianPlane().requestFocus();
             /* We add the following condition to make sure 
             switching from one portion to another isn't easily 
@@ -927,9 +1065,18 @@ public class MainDocumentController implements Initializable {
 
 
         //player.grantPositionBasedMarks(positionBasedCorrectAnswers);
+        
         player.grantDirectionBasedMarks(directionBasedCorrectAnswers);
+        
+        primaryStage.close();
+        primaryStage = new Stage();
+        
+        primaryStage.setScene(new Scene(player.getDirectionMarks()));
+        primaryStage.setTitle("Marks");
+        primaryStage.show();
+        
 
-        //CartesianPlane.cartesianPlaneNumber = 0;
+       
     }
     
     @Override
@@ -1014,13 +1161,45 @@ public class MainDocumentController implements Initializable {
         numbersRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         allRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         
+        plainRB.setToggleGroup(planesGroup);
+        lettersRB.setToggleGroup(planesGroup);
+        numbersRB.setToggleGroup(planesGroup);
+        allRB.setToggleGroup(planesGroup);
+        
         oneAttemptRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         twoAttemptsRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         threeAttemptsRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         fourAttemptsRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         
+        oneAttemptRB.setSelected(true);
+        clockwiseMoveRB.setSelected(true);
+        
+        clockwiseMoveRB.setToggleGroup(blackBallMovesGroup);
+        anticlockwiseMoveRB.setToggleGroup(blackBallMovesGroup);
+        incrementalMoveRB.setToggleGroup(blackBallMovesGroup);
+        decrementalMoveRB.setToggleGroup(blackBallMovesGroup);
+        
+        clockwiseMoveRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+        anticlockwiseMoveRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+        incrementalMoveRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+        decrementalMoveRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+        
+        oneAttemptRB.setToggleGroup(attemptsGroup);
+        twoAttemptsRB.setToggleGroup(attemptsGroup);
+        threeAttemptsRB.setToggleGroup(attemptsGroup);
+        fourAttemptsRB.setToggleGroup(attemptsGroup);
+        
+        columnsOnlyRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 13));
+        rowsOnlyRB.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 13));
+        
+        columnsOnlyRB.setToggleGroup(movingStrategyGroup);
+        rowsOnlyRB.setToggleGroup(movingStrategyGroup);
+        
         beginGameButton.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
         speedLabelInfo.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 15));
+        
+        blackBallMoveLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 13));
+        regionBallsMoveLabel.setFont(Font.font(null, FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 13));
         
         initiateSomeDataFields();
         initiateMarksMap();

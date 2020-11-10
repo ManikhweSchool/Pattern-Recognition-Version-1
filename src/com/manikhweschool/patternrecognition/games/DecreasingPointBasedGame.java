@@ -9,16 +9,6 @@ import java.util.ArrayList;
 
 public class DecreasingPointBasedGame extends PointBasedGame{
     
-
-    public DecreasingPointBasedGame() throws Exception{
-        
-        DecreasingMove move = new DecreasingMove();
-        move.fillDirections(cartesianPlane.getBall().getCurrentRow(), 
-        cartesianPlane.getBall().getCurrentColumn());
-        
-        cartesianPlane.getBall().setMove(move);  
-    }
-    
     public DecreasingPointBasedGame(boolean positionGame,int width, int height,
     byte forwardSteps, byte backwardSteps,Music music, 
     long startTime,ArrayList<RegionMovingStrategy> moves) throws Exception{

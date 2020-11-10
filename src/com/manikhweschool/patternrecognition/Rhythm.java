@@ -7,9 +7,12 @@ import java.util.Collections;
 public class Rhythm {
 
 	private ArrayList<Long> times;
+        private ArrayList<Long> originalTimes;
         private ArrayList<Boolean> isQuestionable;
 	private int nextTimeIndex;
 	
+        private boolean rhythmFit = false;
+        
 	public Rhythm() {
             times = new ArrayList<>();
             isQuestionable = new ArrayList<>();
@@ -19,6 +22,7 @@ public class Rhythm {
         
         public Rhythm(RhythmType rhythmType) {
             times = new ArrayList<>();
+            
             isQuestionable = new ArrayList<>();
             nextTimeIndex  = -1;
             createRhythm(rhythmType);
@@ -29,6 +33,9 @@ public class Rhythm {
             isQuestionable = new ArrayList<>();
             nextTimeIndex  = -1;
 	}
+        
+        public boolean getRhythmFit(){ return rhythmFit;}
+        public void setRhythmFit(boolean rhythmFit){ this.rhythmFit = rhythmFit;}
         
         private void createRhythm(RhythmType rhythmType){
             
@@ -43,7 +50,7 @@ public class Rhythm {
         public void repeatPattern(long initialTime, long timeBetweenPatterns,long maxPeriod){
         
             
-            ArrayList<Long> originalTimes = (ArrayList<Long>) times.clone();
+            originalTimes = (ArrayList<Long>) times.clone();
             ArrayList<Boolean> originalIsQuestionable = (ArrayList<Boolean>) isQuestionable.clone();
             
             if(originalTimes.isEmpty())
@@ -63,7 +70,13 @@ public class Rhythm {
                 }
                 iterationIndex++;
             }while(currentTime<=maxPeriod);
+            originalTimes = (ArrayList<Long>)times.clone();
+        }
+        
+        public void startOverRhythmShift(){ 
             
+            if(!rhythmFit)
+                times = (ArrayList<Long>)originalTimes.clone();
         }
         
         public boolean getIsQuestionable(int index){

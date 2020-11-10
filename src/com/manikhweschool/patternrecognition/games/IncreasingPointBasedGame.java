@@ -8,15 +8,6 @@ import java.util.ArrayList;
 
 public class IncreasingPointBasedGame extends PointBasedGame{
     
-
-    public IncreasingPointBasedGame() throws Exception{
-        
-        IncreasingMove move = new IncreasingMove();
-        move.fillDirections(cartesianPlane.getBall().getCurrentRow(), 
-        cartesianPlane.getBall().getCurrentColumn());
-        
-        cartesianPlane.getBall().setMove(move);  
-    }
     
     public IncreasingPointBasedGame(boolean positionGame,int width, int height,
     byte forwardSteps, byte backwardSteps,Music music,

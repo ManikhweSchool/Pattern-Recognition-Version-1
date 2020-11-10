@@ -14,100 +14,119 @@
     </stylesheets>
     <children>
         
-        <Label fx:id="gameName" layoutX="100.0" layoutY="40.0" text="Pattern Recognition Version I">
+        <Label fx:id="gameName" layoutX="130.0" layoutY="10.0" text="Pattern Recognition Version I">
             
         </Label>
-        <Label fx:id="musicLabel" layoutX="80.0" layoutY="100.0" text="Trackable Music Location">
+        <Label fx:id="musicLabel" layoutX="80.0" layoutY="70.0" text="Trackable Music Location">
             <font>
                 <Font size="16.0"/>
             </font>
         </Label>
-        <TextField fx:id="musicTextField" layoutX="265.0" layoutY="100.0" prefWidth="180" promptText="choose music">
+        <TextField fx:id="musicTextField" layoutX="265.0" layoutY="70.0" prefWidth="180" promptText="choose music">
             <font>
                 <Font size="16.0"/>
             </font>
         </TextField> 
-        <Button id="createRhythmButton" layoutX="455.0" layoutY="100.0" mnemonicParsing="false" onAction="#playMusic" text="Create Rhythm">
+        <Button id="createRhythmButton" layoutX="455.0" layoutY="70.0" mnemonicParsing="false" onAction="#playMusic" text="Create Rhythm">
             <font>
                 <Font size="16.0"/>
             </font>
         </Button> 
-        <RadioButton   fx:id="plainRB" selected="true"  text="Plain Plane" layoutX="80.0" layoutY="150.0">
-            <toggleGroup>
-                <ToggleGroup fx:id="planes"/> 
-            </toggleGroup>
-        </RadioButton>
-        <RadioButton fx:id="lettersRB" text="Letters Plane" layoutX="200.0" layoutY="150.0">
+        <RadioButton   fx:id="plainRB" selected="true"  text="Plain Plane" layoutX="80.0" layoutY="120.0">
             
         </RadioButton>
-        <RadioButton fx:id="numbersRB" text="Numbers Plane" layoutX="340.0" layoutY="150.0">
+        <RadioButton fx:id="lettersRB" text="Letters Plane" layoutX="200.0" layoutY="120.0">
+ 
+        </RadioButton>
+        <RadioButton fx:id="numbersRB" text="Numbers Plane" layoutX="340.0" layoutY="120.0">
             
         </RadioButton>
-        <RadioButton fx:id="allRB" text="All Planes" layoutX="500.0" layoutY="150.0">
+        <RadioButton fx:id="allRB" text="All Planes" layoutX="500.0" layoutY="120.0">
             
         </RadioButton>
-        <RadioButton   fx:id="oneAttemptRB" text="1 Try" layoutX="80.0" layoutY="190.0">
+        <RadioButton   fx:id="oneAttemptRB" text="1 Level" layoutX="80.0" layoutY="160.0">
            
         </RadioButton>
-        <RadioButton fx:id="twoAttemptsRB" text="2 Tries" layoutX="200.0" layoutY="190.0">
+        <RadioButton fx:id="twoAttemptsRB" text="2 Levels" layoutX="200.0" layoutY="160.0">
             
         </RadioButton>
-        <RadioButton fx:id="threeAttemptsRB" text="3 Tries" layoutX="340.0" layoutY="190.0">
+        <RadioButton fx:id="threeAttemptsRB" text="3 Levels" layoutX="340.0" layoutY="160.0">
             
         </RadioButton>
-        <RadioButton fx:id="fourAttemptsRB" text="4 Tries" layoutX="500.0" layoutY="190.0">
+        <RadioButton fx:id="fourAttemptsRB" text="4 Levels" layoutX="500.0" layoutY="160.0">
             
         </RadioButton>
-        <ComboBox fx:id="typeOfAnswers" layoutX="440.0" layoutY="230.0" promptText="What To Track?" >
+        <ComboBox fx:id="typeOfAnswers" layoutX="440.0" layoutY="200.0" promptText="What To Track?" >
             
         </ComboBox>
-        <Slider fx:id="slider"  valueChanging="true"  showTickLabels="true" layoutX="270.0" layoutY="230.0" >
+        <Slider fx:id="slider"  valueChanging="true"  showTickLabels="true" layoutX="270.0" layoutY="200.0" >
             
         </Slider>  
-        <Label fx:id="speedLabelInfo" layoutX="80.0" layoutY="230.0" text="Ball(s) Speed Multiple"></Label>
+        <Label fx:id="speedLabelInfo" layoutX="80.0" layoutY="200.0" text="Ball(s) Speed Multiple"></Label>
         <Label fx:id="speedLabel" visible="false" ></Label>
         
-        <ListView fx:id="forwardStepsLV" layoutX="80.0" layoutY="280.0" prefWidth="150" prefHeight="200.0">
+        <ListView fx:id="forwardStepsLV" layoutX="80.0" layoutY="250.0" prefWidth="150" prefHeight="200.0">
             
         </ListView> 
-        <ListView fx:id="backwardStepsLV" layoutX="435.0" layoutY="280.0" prefWidth="150" prefHeight="200.0">
+        <ListView fx:id="backwardStepsLV" layoutX="435.0" layoutY="250.0" prefWidth="150" prefHeight="200.0">
             
         </ListView> 
-        <TextArea fx:id="rhythmTextArea" layoutX="230.0" layoutY="280.0" editable="false"  prefWidth="210" prefHeight="200.0" onKeyPressed="#readRhythm">
+        <TextArea fx:id="rhythmTextArea" layoutX="230.0" layoutY="250.0" editable="false"  prefWidth="210" prefHeight="200.0" onKeyPressed="#readRhythm">
             <font>
                 <Font size="14.0"/>
             </font>
         </TextArea>
-        <ComboBox fx:id="r1MovingStrategy" layoutX="180.0" layoutY="495.0" promptText="R1 Move" >
+        <Label  fx:id = "blackBallMoveLabel" layoutX="170.0" layoutY="460.0" text="Choose Black Ball Moving Strategy From Below Choices."></Label>
+        <RadioButton   fx:id="clockwiseMoveRB"  text="Clockwise" layoutX="80.0" layoutY="480.0">
+            
+        </RadioButton>
+        <RadioButton fx:id="anticlockwiseMoveRB" text="Anti-Clockwise" layoutX="200.0" layoutY="480.0">
+ 
+        </RadioButton>
+        <RadioButton fx:id="incrementalMoveRB" text="Incremental" layoutX="340.0" layoutY="480.0">
+            
+        </RadioButton>
+        <RadioButton fx:id="decrementalMoveRB" text="Decremental" layoutX="480.0" layoutY="480.0">
+            
+        </RadioButton>
+        <Label  fx:id = "regionBallsMoveLabel" layoutX="170.0" layoutY="510.0" text="Choose Region Balls' Moving Strategies From Below."></Label>
+        <ComboBox fx:id="r1MovingStrategy" layoutX="90.0" layoutY="535.0" promptText="R1 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r2MovingStrategy" layoutX="330.0" layoutY="495.0" promptText="R2 Move" >
+        <ComboBox fx:id="r2MovingStrategy" layoutX="430.0" layoutY="535.0" promptText="R2 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r3MovingStrategy" layoutX="180.0" layoutY="525.0" promptText="R3 Move" >
+        <ComboBox fx:id="r3MovingStrategy" layoutX="90.0" layoutY="565.0" promptText="R3 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r4MovingStrategy" layoutX="330.0" layoutY="525.0" promptText="R4 Move" >
+        <RadioButton fx:id="rowsOnlyRB" text="Only Row By Row" layoutX="255.0" layoutY="565.0">
+            
+        </RadioButton>
+        
+        <ComboBox fx:id="r4MovingStrategy" layoutX="430.0" layoutY="565.0" promptText="R4 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r5MovingStrategy" layoutX="180.0" layoutY="555.0" promptText="R5 Move" >
+        <RadioButton   fx:id="columnsOnlyRB" text="Only Column By Column" layoutX="255.0" layoutY="595.0">
+           
+        </RadioButton>
+        <ComboBox fx:id="r5MovingStrategy" layoutX="90.0" layoutY="595.0" promptText="R5 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r6MovingStrategy" layoutX="330.0" layoutY="555.0" promptText="R6 Move" >
+        <ComboBox fx:id="r6MovingStrategy" layoutX="430.0" layoutY="595.0" promptText="R6 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r7MovingStrategy" layoutX="180.0" layoutY="585.0" promptText="R7 Move" >
+        <ComboBox fx:id="r7MovingStrategy" layoutX="90.0" layoutY="625.0" promptText="R7 Move" >
             
         </ComboBox>
-        <ComboBox fx:id="r8MovingStrategy" layoutX="330.0" layoutY="585.0" promptText="R8 Move" >
+        <ComboBox fx:id="r8MovingStrategy" layoutX="430.0" layoutY="625.0" promptText="R8 Move" >
             
         </ComboBox>
-        <Button fx:id="beginGameButton" layoutX="80.0" layoutY="625.0" mnemonicParsing="false" onAction="#showGame" text="Start Game">
+        <Button fx:id="beginGameButton" layoutX="80.0" layoutY="665.0" mnemonicParsing="false" onAction="#showGame" text="Start Game">
             <font>
                 <Font size="18.0"/>
             </font>
         </Button> 
-        <Label fx:id="errorLabel" visible="false" layoutX="100.0" layoutY="690.0"></Label>
+        <Label fx:id="errorLabel" visible="false" layoutX="100.0" layoutY="730.0"></Label>
         
     </children>
 </AnchorPane>

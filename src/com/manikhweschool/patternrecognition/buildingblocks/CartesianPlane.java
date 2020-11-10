@@ -1,6 +1,9 @@
 package com.manikhweschool.patternrecognition.buildingblocks;
 
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.Music;
+import com.manikhweschool.patternrecognition.Player;
 import com.manikhweschool.patternrecognition.Trackable;
 import com.manikhweschool.patternrecognition.space.*;
 
@@ -21,7 +24,7 @@ import javafx.scene.text.FontWeight;
 public class CartesianPlane extends GridPane implements Trackable{
     
     private Music music;
-   
+    private Player player;
     
     private RegionColor regionOneColor;
     private RegionColor regionTwoColor;
@@ -83,6 +86,10 @@ public class CartesianPlane extends GridPane implements Trackable{
     
     private Location currentPortionToTrack;
     private byte currentRegionIndex;
+    // Useful for detecting whether a player's answer is correct.
+    // Sometimes a region to track might not have moving strategy directions.
+    // So, in that case we don't want our program to throw an exception.
+    private byte currentRegionIndexBackup;
     private int numberOfAllowedMoves;
     
     private Point[][] points;
@@ -97,6 +104,16 @@ public class CartesianPlane extends GridPane implements Trackable{
     private RegionSeven regionSeven;
     private RegionEight regionEight;
     
+    private ArrayList<Integer> regionOneAnswers;
+    private ArrayList<Integer> regionTwoAnswers;
+    private ArrayList<Integer> regionThreeAnswers;
+    private ArrayList<Integer> regionFourAnswers;
+    private ArrayList<Integer> regionFiveAnswers;
+    private ArrayList<Integer> regionSixAnswers;
+    private ArrayList<Integer> regionSevenAnswers;
+    private ArrayList<Integer> regionEightAnswers;
+    private ArrayList<Integer> queenBallAnswers;
+    
     // Number of moves a ball does before reversing.
     private byte forwardSteps;
     // Number of reverse steps a ball does.
@@ -104,6 +121,7 @@ public class CartesianPlane extends GridPane implements Trackable{
     
     private LinkedList<PositionBasedAnswer> positionBasedAnswers;
     private LinkedList<DirectionBasedAnswer> directionBasedAnswers;
+    private byte currentAnswerIndex;
     
     // Contains numbers corresponding to letters(e.g. letter C corresponds to number 1).
     private ArrayList<Byte> letterNumbers;
@@ -114,50 +132,12 @@ public class CartesianPlane extends GridPane implements Trackable{
     private int width; 
     private int height;
     
-    public CartesianPlane() throws Exception{
-    
-        setPrefSize(500, 500);
-        setMinSize(500, 500);
-        setStyle("-fx-border-color: red");
-              
-        music = new Music();
-        // Moving Strategies For All Eight Regions.
-        ArrayList<RegionMovingStrategy> movingStrategies;
-        movingStrategies = new ArrayList<>();
-        RegionMovingStrategy move = ((int)(Math.random()*2)==0)?
-        RegionMovingStrategy.Row_By_Row:RegionMovingStrategy.Column_By_Column;
-        for(int i = 0;i < 8;i++)
-            movingStrategies.add(move);
-
-        forwardSteps = 1;
-        backwardSteps = 0;
-        
-        initiateSomeDataFields(movingStrategies);
-        
-        fillMatrix();
-        addCells();
-        shadePath();
-        
-        
-        classifyPoints();
-        
-        orderRegions();
-        trackOnNextPortion();
-        
-        // The xCenter and yCenter values here don't matter.
-        locateBall(new QueenBall(Color.BLACK,20, currentRow, 
-        currentColumn));
-       
-    }
-    
     public CartesianPlane(int width, int height,
     byte forwardSteps, byte backwardSteps, Music music,
     ArrayList<RegionMovingStrategy> movingStrategies) throws Exception{
         
         refresh(width,height,forwardSteps,backwardSteps,music,movingStrategies);
     }
-    
-   
     
     private void refresh(int width, int height,
     byte forwardSteps, byte backwardSteps, Music music,
@@ -206,6 +186,12 @@ public class CartesianPlane extends GridPane implements Trackable{
         trackOnNextPortion();
         
         locateBall(new QueenBall(Color.BLACK,20, currentRow, currentColumn));
+        
+        queenBallAnswers = new ArrayList<>();
+        
+        // THERE ARE FEW DIRECTIONS THAN THERE SUPPOSE TO BE ON THE LIST "queenBallAnswers".
+        for(Integer direction : ball.getMove().getDirections())
+            queenBallAnswers.add(direction);
     }
     
     public void refresh(){
@@ -235,7 +221,34 @@ public class CartesianPlane extends GridPane implements Trackable{
     public LinkedList<DirectionBasedAnswer> getDirectionBasedAnswers(){ return directionBasedAnswers;}
     
     public Music getMusic(){ return music;}
-    public void setMusic(Music music){ this.music = music;}
+    
+    public void setMusic(Music music){ 
+        this.music = music;
+        
+        if(regionOne.exist()) regionOne.setMusic(music);
+        if(regionTwo.exist()) regionTwo.setMusic(music);
+        if(regionThree.exist()) regionThree.setMusic(music);
+        if(regionFour.exist()) regionFour.setMusic(music);
+        if(regionFive.exist()) regionFive.setMusic(music);
+        if(regionSix.exist()) regionSix.setMusic(music);
+        if(regionSeven.exist()) regionSeven.setMusic(music);
+        if(regionEight.exist()) regionEight.setMusic(music);
+    }
+    
+    public Player getPlayer(){ return player;}
+    
+    public void setPlayer(Player player){ 
+        this.player = player;
+        
+        if(regionOne.exist()) regionOne.setPlayer(player);
+        if(regionTwo.exist()) regionTwo.setPlayer(player);
+        if(regionThree.exist()) regionThree.setPlayer(player);
+        if(regionFour.exist()) regionFour.setPlayer(player);
+        if(regionFive.exist()) regionFive.setPlayer(player);
+        if(regionSix.exist()) regionSix.setPlayer(player);
+        if(regionSeven.exist()) regionSeven.setPlayer(player);
+        if(regionEight.exist()) regionEight.setPlayer(player);
+    }
     
     public String getDisplayableMove(){ return displayableMove;}
     private void setDisplayableMove(){
@@ -353,9 +366,6 @@ public class CartesianPlane extends GridPane implements Trackable{
     
     public static void decreaseTries(){ if(numberOfTries>0)numberOfTries--;}
     
-    /**
-     * @return correct position answers for all available portions to track.
-     */
     public Map<Location, LinkedList<PositionBasedAnswer>> retrieveCorrectPositionBasedAnswers(){
     
         Map<Location, LinkedList<PositionBasedAnswer>> correctAnswers = new LinkedHashMap<>();
@@ -366,9 +376,22 @@ public class CartesianPlane extends GridPane implements Trackable{
         return correctAnswers;
     }
     
-    /**
-     * @return correct direction answers for all available portions to track.
-     */
+    public PositionBasedAnswer findNextPositionAnswer(){
+    
+        Map<Location, LinkedList<PositionBasedAnswer>> correctAnswers = retrieveCorrectPositionBasedAnswers();
+        
+        LinkedList<PositionBasedAnswer> allAnswers = correctAnswers.get(currentPortionToTrack);
+        
+        System.out.println();
+        
+        for(PositionBasedAnswer answer : allAnswers)
+            System.out.print("{Row : " + answer.getRowAnswer() + ", Column : " + answer.getColumnAnswer() + "} ");
+        System.out.println();
+        
+
+        return allAnswers.getLast();
+    }
+    
     public Map<Location, LinkedList<DirectionBasedAnswer>> retrieveCorrectDirectionBasedAnswers(){
     
         Map<Location, LinkedList<DirectionBasedAnswer>> correctAnswers = new LinkedHashMap<>();
@@ -377,6 +400,60 @@ public class CartesianPlane extends GridPane implements Trackable{
            correctAnswers.put(toCellLocation(orderIndex), orderMap.get(orderIndex).getDirectionBasedAnswers());
         
         return correctAnswers;
+    }
+    
+    public DirectionBasedAnswer findNextDirectionAnswer(){
+    
+        Map<Location, LinkedList<DirectionBasedAnswer>> correctAnswers = retrieveCorrectDirectionBasedAnswers();
+        
+        LinkedList<DirectionBasedAnswer> allAnswers = correctAnswers.get(currentPortionToTrack);
+        
+        System.out.println();
+        
+        for(DirectionBasedAnswer answer : allAnswers)
+            System.out.print(answer.getDirectionAnswer() + " ");
+        System.out.println();
+        
+
+        return allAnswers.getLast();
+        
+    }
+    
+    public void increaseCurrentAnswerIndex(){ currentAnswerIndex++;}
+    public int findCurrentDirectionAnswer(){
+        
+        switch(currentPortionToTrack){
+            case Region_One : return regionOneAnswers.get(currentAnswerIndex);
+            case Region_Two : return regionTwoAnswers.get(currentAnswerIndex);
+            case Region_Three : return regionThreeAnswers.get(currentAnswerIndex);
+            case Region_Four : return regionFourAnswers.get(currentAnswerIndex);
+            case Region_Five : return regionFiveAnswers.get(currentAnswerIndex);
+            case Region_Six : return regionSixAnswers.get(currentAnswerIndex);
+            case Region_Seven : return regionSevenAnswers.get(currentAnswerIndex);
+            case Region_Eight : return regionEightAnswers.get(currentAnswerIndex);
+            default : return queenBallAnswers.get(currentAnswerIndex);
+        }
+    }
+    
+    /* Either User findNextDirection() or both findCurrentDirectionAnswer() 
+    and increaseCurrentAnswerIndex() to find the corrent direction answer.
+    All the three methods are not useful if findNextDirectionAnswer() is
+    on the client program.*/
+    public int findNextDirection(){
+    
+        switch(currentPortionToTrack){
+            case Region_One : return regionOneAnswers.get(currentAnswerIndex++);
+            case Region_Two : return regionTwoAnswers.get(currentAnswerIndex++);
+            case Region_Three : return regionThreeAnswers.get(currentAnswerIndex++);
+            case Region_Four : return regionFourAnswers.get(currentAnswerIndex++);
+            case Region_Five : return regionFiveAnswers.get(currentAnswerIndex++);
+            case Region_Six : return regionSixAnswers.get(currentAnswerIndex++);
+            case Region_Seven : return regionSevenAnswers.get(currentAnswerIndex++);
+            case Region_Eight : return regionEightAnswers.get(currentAnswerIndex++);
+            default : return queenBallAnswers.get(currentAnswerIndex++);
+        }
+        
+        
     }
     
     private Location toCellLocation(byte orderIndex){
@@ -401,16 +478,19 @@ public class CartesianPlane extends GridPane implements Trackable{
     
     private void initiateSomeDataFields(ArrayList<RegionMovingStrategy> movingStrategies){
     
-        REFERENCE_ROW = (byte)(1+Math.random()*7);
-        REFERENCE_COLUMN = (byte)(1+Math.random()*7);
+        REFERENCE_ROW = 1/*(byte)(1+Math.random()*7)*/;
+        REFERENCE_COLUMN = 1/*(byte)(1+Math.random()*7)*/;
         currentRow = REFERENCE_ROW;
         currentColumn = REFERENCE_COLUMN;
         
         currentRegionIndex = 0;
+        currentRegionIndexBackup = currentRegionIndex;
         numberOfAllowedMoves = 0;
         
         positionBasedAnswers = new LinkedList<>();
         directionBasedAnswers = new LinkedList<>();
+        
+        currentAnswerIndex = 0;
         
         order = new ArrayList<>();
         orderMap = new HashMap<>();
@@ -1257,6 +1337,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                 regionOne.setRegionOneMove();
                 chooseMove(RegionNumber.Region_One);
                 regionOne.setSteps(forwardSteps, backwardSteps);
+                regionOneAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionOne.getRegionOneMove().getDirections())
+                    regionOneAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1314,8 +1398,13 @@ public class CartesianPlane extends GridPane implements Trackable{
                 addLetterPictures(regionTwo, (byte)1);
                 
                 regionTwo.setRegionTwoMove();
+                
                 chooseMove(RegionNumber.Region_Two);
                 regionTwo.setSteps(forwardSteps, backwardSteps);
+                regionTwoAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionTwo.getRegionTwoMove().getDirections())
+                    regionTwoAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1382,6 +1471,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                 regionEight.setRegionEightMove();
                 chooseMove(RegionNumber.Region_Eight);
                 regionEight.setSteps(forwardSteps, backwardSteps);
+                regionEightAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionEight.getRegionEightMove().getDirections())
+                    regionEightAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1441,6 +1534,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                 regionThree.setRegionThreeMove();
                 chooseMove(RegionNumber.Region_Three);
                 regionThree.setSteps(forwardSteps, backwardSteps);
+                regionThreeAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionThree.getRegionThreeMove().getDirections())
+                    regionThreeAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1497,6 +1594,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                 regionFour.setRegionFourMove();
                 chooseMove(RegionNumber.Region_Four);
                 regionFour.setSteps(forwardSteps, backwardSteps);
+                regionFourAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionFour.getRegionFourMove().getDirections())
+                    regionFourAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1556,6 +1657,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                 regionFive.setRegionFiveMove();
                 chooseMove(RegionNumber.Region_Five);
                 regionFive.setSteps(forwardSteps, backwardSteps);
+                regionFiveAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionFive.getRegionFiveMove().getDirections())
+                    regionFiveAnswers.add(direction);
                 
                 regionBall.radiusXProperty().bind(
                 coordinates[0][0].prefWidthProperty().add(
@@ -1613,6 +1718,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                     regionSix.setRegionSixMove();
                     chooseMove(RegionNumber.Region_Six);
                     regionSix.setSteps(forwardSteps, backwardSteps);
+                    regionSixAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionSix.getRegionSixMove().getDirections())
+                    regionSixAnswers.add(direction);
 
                     regionBall.radiusXProperty().bind(
                     coordinates[0][0].prefWidthProperty().add(
@@ -1672,6 +1781,10 @@ public class CartesianPlane extends GridPane implements Trackable{
                     regionSeven.setRegionSevenMove();
                     chooseMove(RegionNumber.Region_Seven);
                     regionSeven.setSteps(forwardSteps, backwardSteps);
+                    regionSevenAnswers = new ArrayList<>();
+                
+                for(Integer direction : regionSeven.getRegionSevenMove().getDirections())
+                    regionSevenAnswers.add(direction);
                     
                     regionBall.radiusXProperty().bind(
                     coordinates[0][0].prefWidthProperty().add(

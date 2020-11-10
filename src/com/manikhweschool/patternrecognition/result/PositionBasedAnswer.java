@@ -1,6 +1,6 @@
-package com.manikhweschool.patternrecognition.buildingblocks;
+package com.manikhweschool.patternrecognition.result;
 
-import com.manikhweschool.patternrecognition.Answer;
+import com.manikhweschool.patternrecognition.result.Answer;
 
 public class PositionBasedAnswer extends Answer{
     

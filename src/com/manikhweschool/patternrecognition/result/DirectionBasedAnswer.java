@@ -1,6 +1,4 @@
-package com.manikhweschool.patternrecognition.buildingblocks;
-
-import com.manikhweschool.patternrecognition.Answer;
+package com.manikhweschool.patternrecognition.result;
 
 public class DirectionBasedAnswer extends Answer{
     

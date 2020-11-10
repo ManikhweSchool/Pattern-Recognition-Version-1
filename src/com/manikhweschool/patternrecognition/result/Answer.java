@@ -1,4 +1,4 @@
-package com.manikhweschool.patternrecognition;
+package com.manikhweschool.patternrecognition.result;
 
 public class Answer {
    

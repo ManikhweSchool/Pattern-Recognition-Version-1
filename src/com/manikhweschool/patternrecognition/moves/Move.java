@@ -1,24 +1,27 @@
 package com.manikhweschool.patternrecognition.moves;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Move{
 
     protected int currentDirectionIndex = 0;
     protected ArrayList<Integer> directions = new ArrayList<>();
-    //protected boolean isActive;
         
     public abstract int getNextDirection();
         
     public int getCurrentDirectionIndex(){
         return currentDirectionIndex;
     }
-        
-    //public void setIsActive(boolean isActive){ this.isActive = isActive;}
     
     @Override
     public String toString(){
         return directions.toString();
+    }
+    
+    public List<Integer> getDirections(){
+        return Collections.unmodifiableList(directions);
     }
     
         
@@ -39,9 +42,8 @@ public abstract class Move{
         
         return oppositeDirection;
     }
-    
         
-        protected void fillHelper(byte forwardSteps, byte backwardSteps){
+    protected void fillHelper(byte forwardSteps, byte backwardSteps){
     
         if(forwardSteps==1 && backwardSteps==0)
             return;

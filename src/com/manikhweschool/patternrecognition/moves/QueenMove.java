@@ -14,10 +14,7 @@ public abstract class QueenMove extends Move{
         
             if(directions.isEmpty())
                 fillDirections(startRow, startColumn);
-            /*
-            System.out.println("Size : " + directions.size());           
-            fillHelper(forwardSteps, backwardSteps);
-            System.out.println("Size : " + directions.size());*/
+            
         }
         
         @Override

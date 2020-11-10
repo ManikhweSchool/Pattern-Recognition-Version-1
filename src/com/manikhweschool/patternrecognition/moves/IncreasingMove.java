@@ -2,6 +2,9 @@ package com.manikhweschool.patternrecognition.moves;
 
 public class IncreasingMove extends QueenMove{
     
+    public IncreasingMove() {
+
+    }
     
     
      @Override

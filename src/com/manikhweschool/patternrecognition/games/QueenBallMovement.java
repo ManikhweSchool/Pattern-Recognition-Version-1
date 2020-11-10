@@ -1,8 +1,8 @@
 package com.manikhweschool.patternrecognition.games;
 
 import com.manikhweschool.patternrecognition.buildingblocks.CartesianPlane;
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
 import com.manikhweschool.patternrecognition.Rhythm;
 import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
@@ -109,7 +109,13 @@ public class QueenBallMovement extends MovementTask{
         @Override
         public void handle(ActionEvent e){
 
-            movePoint();    
+            movePoint(); 
+            
+            if(cartesianPlane.isCurrentBallInvisible() && 
+            cartesianPlane.getMusic().getCurrentRhythm().getRhythmFit())
+                cartesianPlane.getPlayer().getDirectionMarks().increaseNoOfStepsExceeded();
+                
+            
         } 
         
     }

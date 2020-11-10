@@ -1,7 +1,7 @@
 package com.manikhweschool.patternrecognition;
 
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
 import java.util.LinkedList;
 
 public interface Trackable {

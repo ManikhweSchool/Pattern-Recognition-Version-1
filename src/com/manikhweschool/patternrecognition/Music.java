@@ -10,22 +10,17 @@ public class Music{
 
     private long periodInMilliseconds;
     private String fileLocation;
-    private ArrayList<Rhythm> rhythms = new ArrayList<>();
+    private ArrayList<Rhythm> rhythms;
     private int currentRhythmIndex = 0;
     private MediaPlayer mediaPlayer;
 	
-    public Music() {
-        
-	//rhythms.add(new Rhythm());
-	//periodInMilliseconds = rhythms.get(0).getTimes().get((rhythms.get(0).getTimes().size()-1)) + 5000;
-	//fileLocation = "C:/Users/Test/Music/Gospel/NCANDWENI/Bakhiphe-Moses.mp3";
-        //mediaPlayer = new MediaPlayer(new Media(fileLocation));
-    }
     
     public Music(String fileLocation) {
         
 	this.fileLocation = new File(fileLocation).toURI().toString();
         mediaPlayer = new MediaPlayer(new Media(this.fileLocation));
+        rhythms = new ArrayList<>();
+        //mediaPlayer.setVolume(0);
     }
 	
     public Music(Rhythm rhythm, String fileLocation, long periodInMilliseconds) {

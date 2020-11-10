@@ -96,6 +96,8 @@ public abstract class RegionMove extends Move{
            
             if(directions.isEmpty())
                fillRowByRow(cells);
+               
+            
            
             if(isInfinite){
                 ArrayList<Integer> anotherDirections = new ArrayList<>();

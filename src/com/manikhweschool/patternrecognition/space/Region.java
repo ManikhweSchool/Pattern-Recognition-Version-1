@@ -1,14 +1,15 @@
 
 package com.manikhweschool.patternrecognition.space;
 
-import com.manikhweschool.patternrecognition.buildingblocks.PositionBasedAnswer;
-import com.manikhweschool.patternrecognition.buildingblocks.DirectionBasedAnswer;
+import com.manikhweschool.patternrecognition.Music;
+import com.manikhweschool.patternrecognition.Player;
+import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
+import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.buildingblocks.Cell;
 import com.manikhweschool.patternrecognition.Trackable;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import javafx.scene.paint.Color;
 
 public abstract class Region implements Trackable{
     protected ArrayList<Cell> regionCells = new ArrayList<>();
@@ -18,6 +19,9 @@ public abstract class Region implements Trackable{
     protected int numberOfAllowedMoves = 0;
     protected LinkedList<PositionBasedAnswer> positionBasedAnswers;
     protected LinkedList<DirectionBasedAnswer> directionBasedAnswers;
+    
+    private Player player;
+    private Music music;
     
     private boolean isVisited = false;
     protected boolean goingForward = true;
@@ -42,6 +46,11 @@ public abstract class Region implements Trackable{
     public byte getInitBackwardSteps(){ return initBackwardSteps;}
     
     public abstract void fillInCircle();
+    
+    public Music getMusic(){ return music;}
+    public void setMusic(Music music){ this.music = music;}
+    public Player getPlayer(){ return player;}
+    public void setPlayer(Player player){ this.player = player;}
     
     public boolean hasAtLeastOneCells(){ return !regionCells.isEmpty();}
     
