@@ -3,16 +3,21 @@ package com.manikhweschool.patternrecognition.games;
 import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
 import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.Rhythm;
+import com.manikhweschool.patternrecognition.buildingblocks.CartesianPlane;
+import com.manikhweschool.patternrecognition.buildingblocks.Location;
 import com.manikhweschool.patternrecognition.space.Region;
 
 import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
 public class RegionBallMovement  extends MovementTask{
     
     private Region region;
+    private Paint paint;
+    private boolean isPaintInitialized = false;
     
     public RegionBallMovement(Region region, Rhythm rhythm, long startTime){
         super(rhythm, startTime);
@@ -105,10 +110,26 @@ public class RegionBallMovement  extends MovementTask{
     }
      
     private class PointBasedMovementHandler implements EventHandler<ActionEvent>{
-    
+        
+        
         @Override
         public void handle(ActionEvent e){
-
+            
+            if(!isPaintInitialized){
+                paint = region.getRegionBall().getFill();
+                isPaintInitialized = true;
+            }
+            
+            if(CartesianPlane.cartesianPlaneNumber==2){
+                if(region.getIsCurrentPortionToTrack()){
+                    paint = region.getRegionBall().getFill();
+                    region.getRegionBall().setFill(null);   
+                }
+                else{
+                    region.getRegionBall().fillBallColor();
+                }
+            }
+            
             movePoint();    
             
             

@@ -26,6 +26,7 @@ public class RegionBall extends Ball implements Cloneable{
         if(move == null)
             throw new Exception("Make sure you provided a move.");
         this.move = move;
+        
     }
         
        

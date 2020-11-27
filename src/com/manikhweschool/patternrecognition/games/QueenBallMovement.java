@@ -4,9 +4,12 @@ import com.manikhweschool.patternrecognition.buildingblocks.CartesianPlane;
 import com.manikhweschool.patternrecognition.result.DirectionBasedAnswer;
 import com.manikhweschool.patternrecognition.result.PositionBasedAnswer;
 import com.manikhweschool.patternrecognition.Rhythm;
+import com.manikhweschool.patternrecognition.buildingblocks.Location;
 import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
 
@@ -106,9 +109,21 @@ public class QueenBallMovement extends MovementTask{
     
     private class PointBasedMovementHandler implements EventHandler<ActionEvent>{
     
+        Paint paint = Color.BLACK;
+        
         @Override
         public void handle(ActionEvent e){
 
+            if(CartesianPlane.cartesianPlaneNumber==2){
+                if(cartesianPlane.getCurrentPortionToTrack()== Location.On_Path){
+                    paint = cartesianPlane.getBall().getFill();
+                    cartesianPlane.getBall().setFill(null);   
+                }
+                else{
+                    cartesianPlane.getBall().setFill(paint);
+                }
+            }
+            
             movePoint(); 
             
             if(cartesianPlane.isCurrentBallInvisible() && 

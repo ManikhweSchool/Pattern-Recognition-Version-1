@@ -2,16 +2,21 @@
 <jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Pattern Recognition.jnlp">
   <information>
     <title>Pattern Recognition</title>
-    <vendor>Test</vendor>
-    <description>null</description>
+    <vendor>Lwandile Ganyile</vendor>
+    <description>Pattern Recognition version 1.0 is the first game that Lwandile Ganyile created in order to demonstration the power that music has on our heart. 
+He believes it is because of this power(emotional control) that many things can be archived including visualization skills, counting skills, having photographic memory, and many more. This version of the game might not have been able to prove/demonstrate that, but hopefully future versions will.</description>
     <offline-allowed/>
+  <shortcut><desktop/></shortcut>
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
   </resources>
+<security>
+  <all-permissions/>
+</security>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="Pattern Recognition" >
     <param name="requiredFXVersion" value="8.0+"/>
   </applet-desc>
   <jfx:javafx-desc  width="800" height="600" main-class="pattern.recognition.PatternRecognition"  name="Pattern Recognition" />
-  <update check="always"/>
+  <update check="background"/>
 </jnlp>

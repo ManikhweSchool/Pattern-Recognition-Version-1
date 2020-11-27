@@ -20,7 +20,7 @@ public class Music{
 	this.fileLocation = new File(fileLocation).toURI().toString();
         mediaPlayer = new MediaPlayer(new Media(this.fileLocation));
         rhythms = new ArrayList<>();
-        //mediaPlayer.setVolume(0);
+        mediaPlayer.setVolume(0);
     }
 	
     public Music(Rhythm rhythm, String fileLocation, long periodInMilliseconds) {

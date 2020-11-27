@@ -478,8 +478,8 @@ public class CartesianPlane extends GridPane implements Trackable{
     
     private void initiateSomeDataFields(ArrayList<RegionMovingStrategy> movingStrategies){
     
-        REFERENCE_ROW = 1/*(byte)(1+Math.random()*7)*/;
-        REFERENCE_COLUMN = 1/*(byte)(1+Math.random()*7)*/;
+        REFERENCE_ROW = (byte)(1+Math.random()*7);
+        REFERENCE_COLUMN = (byte)(1+Math.random()*7);
         currentRow = REFERENCE_ROW;
         currentColumn = REFERENCE_COLUMN;
         
