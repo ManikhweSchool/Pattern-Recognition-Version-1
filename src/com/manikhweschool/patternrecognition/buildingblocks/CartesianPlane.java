@@ -192,6 +192,9 @@ public class CartesianPlane extends GridPane implements Trackable{
         // THERE ARE FEW DIRECTIONS THAN THERE SUPPOSE TO BE ON THE LIST "queenBallAnswers".
         for(Integer direction : ball.getMove().getDirections())
             queenBallAnswers.add(direction);
+        
+        if(music.getCurrentMillis()>=1000)
+            music.startOver();
     }
     
     public void refresh(){
@@ -407,13 +410,6 @@ public class CartesianPlane extends GridPane implements Trackable{
         Map<Location, LinkedList<DirectionBasedAnswer>> correctAnswers = retrieveCorrectDirectionBasedAnswers();
         
         LinkedList<DirectionBasedAnswer> allAnswers = correctAnswers.get(currentPortionToTrack);
-        
-        System.out.println();
-        
-        for(DirectionBasedAnswer answer : allAnswers)
-            System.out.print(answer.getDirectionAnswer() + " ");
-        System.out.println();
-        
 
         return allAnswers.getLast();
         
@@ -482,6 +478,7 @@ public class CartesianPlane extends GridPane implements Trackable{
         REFERENCE_COLUMN = (byte)(1+Math.random()*7);
         currentRow = REFERENCE_ROW;
         currentColumn = REFERENCE_COLUMN;
+        
         
         currentRegionIndex = 0;
         currentRegionIndexBackup = currentRegionIndex;
@@ -608,6 +605,8 @@ public class CartesianPlane extends GridPane implements Trackable{
         
         for(RegionColor color : allColors)
             ballColors.put(color, false);
+        
+        
     }
     
     public static void incrementCartesianPlaneNumber(){ 

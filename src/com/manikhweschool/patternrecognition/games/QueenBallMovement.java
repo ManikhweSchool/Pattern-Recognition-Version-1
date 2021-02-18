@@ -136,6 +136,7 @@ public class QueenBallMovement extends MovementTask{
     }
      
      private void movePoint(){
+         
 
         direction  = cartesianPlane.getBall().getMove().getNextDirection();
         

@@ -1,6 +1,7 @@
 package com.manikhweschool.patternrecognition.games;
 
 import com.manikhweschool.patternrecognition.buildingblocks.CartesianPlane;
+import java.util.ArrayList;
 
 public class PointBasedGame  extends Game{
    
@@ -40,10 +41,13 @@ public class PointBasedGame  extends Game{
     
     private void initializeAnimation(){
         
+        ArrayList<RegionBallMovement> regionBallsMovement = new ArrayList<>();
+        
         if(cartesianPlane.getRegionOne().exist()){
             regionOneTask = new RegionBallMovement(
             cartesianPlane.getRegionOne(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionOneTask);
             regionOneThread = new Thread(regionOneTask);
             regionOneThread.start();
         }
@@ -51,6 +55,7 @@ public class PointBasedGame  extends Game{
             regionTwoTask = new RegionBallMovement(
             cartesianPlane.getRegionTwo(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionTwoTask);
             regionTwoThread = new Thread(regionTwoTask);
             regionTwoThread.start();
             
@@ -59,6 +64,7 @@ public class PointBasedGame  extends Game{
             regionThreeTask = new RegionBallMovement(
             cartesianPlane.getRegionThree(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionThreeTask);
             regionThreeThread = new Thread(regionThreeTask);
             regionThreeThread.start();
         }
@@ -66,6 +72,7 @@ public class PointBasedGame  extends Game{
             regionFourTask = new RegionBallMovement(
             cartesianPlane.getRegionFour(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionFourTask);
             regionFourThread = new Thread(regionFourTask);
             regionFourThread.start();
         }
@@ -73,6 +80,7 @@ public class PointBasedGame  extends Game{
             regionFiveTask = new RegionBallMovement(
             cartesianPlane.getRegionFive(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionFiveTask);
             regionFiveThread = new Thread(regionFiveTask);
             regionFiveThread.start();
         }
@@ -80,6 +88,7 @@ public class PointBasedGame  extends Game{
             regionSixTask = new RegionBallMovement(
             cartesianPlane.getRegionSix(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionSixTask);
             regionSixThread = new Thread(regionSixTask);
             regionSixThread.start();
             
@@ -88,6 +97,7 @@ public class PointBasedGame  extends Game{
             regionSevenTask = new RegionBallMovement(
             cartesianPlane.getRegionSeven(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionSevenTask);
             regionSevenThread = new Thread(regionSevenTask);
             regionSevenThread.start();
             
@@ -96,6 +106,7 @@ public class PointBasedGame  extends Game{
             regionEightTask = new RegionBallMovement(
             cartesianPlane.getRegionEight(), cartesianPlane.getMusic().getCurrentRhythm(),
             startTime);
+            regionBallsMovement.add(regionEightTask);
             regionEightThread = new Thread(regionEightTask);
             regionEightThread.start();
             
@@ -106,6 +117,9 @@ public class PointBasedGame  extends Game{
         cartesianPlane.getMusic().getCurrentRhythm(),startTime);
         onPathPortionThread = new Thread(onPathPortionTask);
         onPathPortionThread.start();
+        
+        cartesianPlane.getMusic().setOnEndOfMedia(
+        new OnMediaEnd(onPathPortionTask,regionBallsMovement));
     }
     
     private void handleRhythmShiftButtons(){

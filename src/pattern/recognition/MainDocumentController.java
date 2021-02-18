@@ -174,6 +174,11 @@ public class MainDocumentController implements Initializable {
     
     public static boolean gameHasStarted = false;
     
+    // User Input : Current Player Answer.
+    byte direction = -1;
+    // User Input : Previous Player Answer.
+    byte previousDirection = -1;
+    
     
     public void readRhythm(KeyEvent event){
     
@@ -528,67 +533,7 @@ public class MainDocumentController implements Initializable {
                 movingStrategies.add(RegionMovingStrategy.Column_By_Column);
         }
         
-        primaryStage = new Stage();
-        try{
-            if(plane==Plane.Plain_Plane || plane==Plane.All_Planes){
-                CartesianPlane.cartesianPlaneNumber = 0;
-                
-            }
-            else if(plane==Plane.Letters_Plane){
-                CartesianPlane.cartesianPlaneNumber = 1;
-                
-            }
-            else if(plane==Plane.Numbers_Plane){
-                CartesianPlane.cartesianPlaneNumber = 2;
-                
-            }
-            
-            player = new Player(numberOfTries);
-            
-            CartesianPlane.setNumberOfTries(numberOfTries);
-            CartesianPlane.setPlaneType(plane);
-            
-            if(clockwiseMoveRB.isSelected())
-                game = new ClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
-                backwardSteps, music, startTime, movingStrategies);
-            else if(anticlockwiseMoveRB.isSelected())
-                game = new AntiClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
-                backwardSteps, music, startTime,movingStrategies);
-            else if(incrementalMoveRB.isSelected())
-                game = new IncreasingPointBasedGame(positionGame,width,height,forwardSteps, 
-                backwardSteps, music, startTime,movingStrategies);
-            else
-                game = new DecreasingPointBasedGame(positionGame,width,height,forwardSteps, 
-                backwardSteps, music, startTime,movingStrategies);
-            
-            
-            addCellListeners();
-            game.getCartesianPlane().setPlayer(player);
-            game.getCartesianPlane().requestFocus();
-            
-            Scene scene = new Scene(game);
-            
-            primaryStage.setScene(scene);
-            
-            
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-        
-        
-        primaryStage.setTitle("Pattern Recognition Version I");
-        primaryStage.show();
-        
-        
-        initializeAnimation();
-        
-        
-        new Thread(new MusicTask()).start();
-        new Thread(new TimelineTask()).start();
-        startTime = System.currentTimeMillis();
-        
-        game.getCartesianPlane().requestFocus();
-        gameHasStarted = true;
+        dealWithNewGame();
     }
     
     private void initiateSomeDataFields(){
@@ -654,8 +599,8 @@ public class MainDocumentController implements Initializable {
     
         game.getCartesianPlane().setOnKeyPressed(e->{
         
-            byte direction = -1;
-            byte previousDirection = direction;
+            direction = -1;
+            
             
             if(music.getCurrentRhythm().getRhythmFit() && !positionGame && (e.getCode()==KeyCode.NUMPAD4 || e.getCode()==KeyCode.LEFT))
                 direction = 1;          
@@ -679,17 +624,20 @@ public class MainDocumentController implements Initializable {
                 DirectionBasedAnswer answer = new DirectionBasedAnswer(
                 System.currentTimeMillis()-startTime, direction);
                 
-                int nextAnswer = 
+                int currentAnswer = 
                 game.getCartesianPlane().findNextDirectionAnswer().getDirectionAnswer();
-                System.out.println("Next Answer : " + nextAnswer + "\tPlayer Answer : " + direction);
+                System.out.println("Correct Answer : " + currentAnswer + "\tPlayer Answer : " + direction);
                 player.getDirectionMarks().resetUnansweredNoOfSteps();
                 
-                if(direction != nextAnswer &&
-                previousDirection != nextAnswer){
+                
+                if(direction != currentAnswer &&
+                previousDirection != currentAnswer){
                     player.getDirectionMarks().setIncorrectInput(true);
                     
                     endGame();
                 }
+                
+                previousDirection = direction;
                 
                 player.addAnswer(CartesianPlane.cartesianPlaneNumber, 
                 answer,game.getCartesianPlane().getCurrentPortionToTrack());
@@ -1046,6 +994,15 @@ public class MainDocumentController implements Initializable {
     
     private void endGame(){
     
+        if(!rhythm.getRhythmFit()){
+        primaryStage.close();
+    
+        music.stop();
+        dealWithNewGame();
+        music.startOver();
+            return;
+        }
+        
         long minutes;
         long seconds;
 
@@ -1077,6 +1034,71 @@ public class MainDocumentController implements Initializable {
         
 
        
+    }
+    
+    private void dealWithNewGame(){
+    
+        primaryStage = new Stage();
+        
+        try{
+            if(plane==Plane.Plain_Plane || plane==Plane.All_Planes){
+                CartesianPlane.cartesianPlaneNumber = 0;
+                
+            }
+            else if(plane==Plane.Letters_Plane){
+                CartesianPlane.cartesianPlaneNumber = 1;
+                
+            }
+            else if(plane==Plane.Numbers_Plane){
+                CartesianPlane.cartesianPlaneNumber = 2;
+                
+            }
+            
+            player = new Player(numberOfTries);
+            
+            CartesianPlane.setNumberOfTries(numberOfTries);
+            CartesianPlane.setPlaneType(plane);
+            
+            if(clockwiseMoveRB.isSelected())
+                game = new ClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime, movingStrategies);
+            else if(anticlockwiseMoveRB.isSelected())
+                game = new AntiClockwisePointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            else if(incrementalMoveRB.isSelected())
+                game = new IncreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            else
+                game = new DecreasingPointBasedGame(positionGame,width,height,forwardSteps, 
+                backwardSteps, music, startTime,movingStrategies);
+            
+            addCellListeners();
+            game.getCartesianPlane().setPlayer(player);
+            game.getCartesianPlane().requestFocus();
+            
+            Scene scene = new Scene(game);
+            
+            primaryStage.setScene(scene); primaryStage.close();
+            
+            
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        
+        
+        primaryStage.setTitle("Pattern Recognition Version I");
+        primaryStage.show();
+        
+        
+        initializeAnimation();
+        
+        
+        new Thread(new MusicTask()).start();
+        new Thread(new TimelineTask()).start();
+        startTime = System.currentTimeMillis();
+        
+        game.getCartesianPlane().requestFocus();
+        gameHasStarted = true;
     }
     
     @Override

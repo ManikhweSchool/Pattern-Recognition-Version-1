@@ -143,6 +143,8 @@ public class RegionBallMovement  extends MovementTask{
      
      private void movePoint(){
         
+         
+         
         direction  = region.getRegionBall().getMove().getNextDirection();
         
         switch(direction) {

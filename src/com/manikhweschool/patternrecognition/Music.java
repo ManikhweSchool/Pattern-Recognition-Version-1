@@ -20,7 +20,7 @@ public class Music{
 	this.fileLocation = new File(fileLocation).toURI().toString();
         mediaPlayer = new MediaPlayer(new Media(this.fileLocation));
         rhythms = new ArrayList<>();
-        mediaPlayer.setVolume(0);
+        //mediaPlayer.setVolume(0);
     }
 	
     public Music(Rhythm rhythm, String fileLocation, long periodInMilliseconds) {
@@ -28,6 +28,15 @@ public class Music{
 	this.fileLocation = fileLocation;
         this.periodInMilliseconds = periodInMilliseconds;
         mediaPlayer = new MediaPlayer(new Media(fileLocation));
+    }
+    
+    public void  setOnPlaying(Runnable task){
+    
+         mediaPlayer.setOnPlaying(task);
+    }
+    
+    public void setOnEndOfMedia(Runnable task){
+        mediaPlayer.setOnEndOfMedia(task);
     }
     
     public void setStartTime(Duration startTime){
@@ -42,6 +51,11 @@ public class Music{
     public void startOver(){
         mediaPlayer.seek(mediaPlayer.getStartTime());
         play();
+    }
+    
+    public double getCurrentMillis(){
+    
+        return mediaPlayer.getCurrentTime().toMillis();
     }
     
     public void stop(){
